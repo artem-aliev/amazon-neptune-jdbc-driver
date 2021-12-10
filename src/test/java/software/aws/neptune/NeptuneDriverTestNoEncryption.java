@@ -20,6 +20,9 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.SQLException;
 
 public class NeptuneDriverTestNoEncryption extends NeptuneDriverTestBase {
@@ -31,7 +34,7 @@ public class NeptuneDriverTestNoEncryption extends NeptuneDriverTestBase {
      */
     @BeforeAll
     public static void initializeDatabase() {
-        initializeDatabase(NO_ENCRYPTION);
+        //initializeDatabase(NO_ENCRYPTION);
     }
 
     /**
@@ -39,7 +42,7 @@ public class NeptuneDriverTestNoEncryption extends NeptuneDriverTestBase {
      */
     @AfterAll
     public static void shutdownDatabase() {
-        shutdownTheDatabase();
+        //shutdownTheDatabase();
     }
 
     @BeforeEach
@@ -52,6 +55,13 @@ public class NeptuneDriverTestNoEncryption extends NeptuneDriverTestBase {
         super.testAcceptsUrl(NO_ENCRYPTION);
     }
 
+
+    @Test
+    void testSQL() throws SQLException {
+        String url = "jdbc:neptune:sqlgremlin://127.0.0.1;port=8182;authScheme=None;enableSsl=false";
+        Connection connection = DriverManager.getConnection(url);
+        connection.createStatement().executeQuery("select * from created");
+    }
     @Test
     void testConnect() throws SQLException {
         super.testConnect(NO_ENCRYPTION);
