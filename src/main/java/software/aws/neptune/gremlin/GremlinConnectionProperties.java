@@ -80,7 +80,7 @@ public class GremlinConnectionProperties extends ConnectionProperties {
     public static final int DEFAULT_PORT = 8182;
     public static final boolean DEFAULT_ENABLE_SSL = true;
     public static final boolean DEFAULT_SSL_SKIP_VALIDATION = false;
-    public static final Serializers DEFAULT_SERIALIZER = Serializers.GRAPHBINARY_V1D0;
+    public static final Serializers DEFAULT_SERIALIZER = Serializers.GRAPHSON_V3D0;
     public static final Map<String, Object> DEFAULT_PROPERTIES_MAP = new HashMap<>();
     private static final List<String> SUPPORTED_PROPERTIES_LIST = ImmutableList.<String>builder()
             .add(CONTACT_POINT_KEY)

@@ -20,10 +20,13 @@ import org.apache.tinkerpop.gremlin.driver.Client;
 import org.apache.tinkerpop.gremlin.driver.Cluster;
 import org.apache.tinkerpop.gremlin.driver.SigV4WebSocketChannelizer;
 import org.apache.tinkerpop.gremlin.driver.remote.DriverRemoteConnection;
+import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversalSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.twilmes.sql.gremlin.adapter.converter.schema.HugeGraphSchemaGrabber;
 import org.twilmes.sql.gremlin.adapter.converter.schema.SqlSchemaGrabber;
 import org.twilmes.sql.gremlin.adapter.converter.schema.calcite.GremlinSchema;
+import software.aws.neptune.gremlin.GremlinConnectionProperties;
 import software.aws.neptune.jdbc.utilities.SqlError;
 import software.aws.neptune.jdbc.utilities.SqlState;
 import java.sql.SQLException;
@@ -44,6 +47,7 @@ public class SchemaHelperGremlinDataModel {
         builder.maxWaitForConnection(CONNECTION_TIMEOUT);
         builder.maxConnectionPoolSize(MAX_CONNECTION_POOL_SIZE);
         builder.minConnectionPoolSize(MIN_CONNECTION_POOL_SIZE);
+        builder.serializer(GremlinConnectionProperties.DEFAULT_SERIALIZER);
         if (useIam) {
             builder.channelizer(SigV4WebSocketChannelizer.class);
         }
@@ -85,8 +89,8 @@ public class SchemaHelperGremlinDataModel {
                                                final SqlSchemaGrabber.ScanType scanType)
             throws SQLException {
         final String adjustedEndpoint = getAdjustedEndpoint(endpoint, pathType);
-        return SqlSchemaGrabber.getSchema(
-                traversal().withRemote(DriverRemoteConnection.using(getClient(adjustedEndpoint, port, useIAM, useSsl))),
-                scanType);
+        //final GraphTraversalSource g = traversal().withRemote(DriverRemoteConnection.using(getClient(adjustedEndpoint, port, useIAM, useSsl)));
+        //return SqlSchemaGrabber.getSchema(g, scanType);
+        return HugeGraphSchemaGrabber.getSchema(getClient(adjustedEndpoint, port, useIAM, useSsl));
     }
 }

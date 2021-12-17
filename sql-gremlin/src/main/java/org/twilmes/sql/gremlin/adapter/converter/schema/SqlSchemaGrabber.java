@@ -34,7 +34,7 @@ public final class SqlSchemaGrabber {
     private static final String VERTEX_EDGES_LABEL_QUERY = "g.V().hasLabel('%s').%sE().label().dedup()";
     private static final String PROPERTIES_VALUE_QUERY = "g.%s().hasLabel('%s').values('%s').%s";
     private static final String PROPERTY_KEY_QUERY = "g.%s().hasLabel('%s').properties().key().dedup()";
-    private static final String LABELS_QUERY = "g.%s().label().dedup()";
+    private static final String LABELS_QUERY = "hugegraph.schema().getEdgeLabels().collect {it.name()}";
     private static final String IN_OUT_VERTEX_QUERY =
             "g.E().hasLabel('%s').project('in','out').by(inV().label()).by(outV().label()).dedup()";
 

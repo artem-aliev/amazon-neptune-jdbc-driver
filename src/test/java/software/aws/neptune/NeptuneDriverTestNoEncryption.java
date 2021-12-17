@@ -20,6 +20,10 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class NeptuneDriverTestNoEncryption extends NeptuneDriverTestBase {
@@ -45,6 +49,19 @@ public class NeptuneDriverTestNoEncryption extends NeptuneDriverTestBase {
     @BeforeEach
     void initialize() {
         super.initialize();
+    }
+
+    //@Test
+    void testSQL() throws SQLException {
+        String url = "jdbc:neptune:sqlgremlin://127.0.0.1;port=8182;authScheme=None;enableSsl=false";
+        Connection connection = DriverManager.getConnection(url);
+        ResultSet result = connection.createStatement().executeQuery("select person.name p, software.name s from person inner join software on person.created_OUT_ID = software.created_IN_ID limit 1");
+        while (result.next()) {
+            for(int i =1; i <=result.getMetaData().getColumnCount();i++){
+                System.out.print(" " +result.getObject(i));
+            }
+            System.out.println("");
+        }
     }
 
     @Test
