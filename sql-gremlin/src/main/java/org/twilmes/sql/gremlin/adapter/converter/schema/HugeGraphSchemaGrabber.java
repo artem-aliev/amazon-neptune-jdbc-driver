@@ -88,7 +88,7 @@ public final class HugeGraphSchemaGrabber {
     }
 
     private static String fixType(String type) {
-        return type.equals("Date")?"String":type;
+        return (type.equals("Date")?"String":type).toLowerCase(Locale.getDefault());
     }
 
     @NotNull
