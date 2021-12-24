@@ -148,7 +148,7 @@ public abstract class GremlinSqlSelect extends GremlinSqlNode {
         applyColumnRetrieval(graphTraversal, table, sqlNodeList, StepDirection.None);
     }
 
-    private void applyOffset(final GraphTraversal<?, ?> graphTraversal) throws SQLException {
+    protected void applyOffset(final GraphTraversal<?, ?> graphTraversal) throws SQLException {
         // TODO: AN-885 implement OFFSET
         // Gremlin doesn't seem to directly support offset,
         // we probably need to inject numeric literal value
@@ -159,7 +159,7 @@ public abstract class GremlinSqlSelect extends GremlinSqlNode {
         }
     }
 
-    private void applyLimit(final GraphTraversal<?, ?> graphTraversal) {
+    protected void applyLimit(final GraphTraversal<?, ?> graphTraversal) {
         if (sqlSelect.getFetch() instanceof SqlNumericLiteral) {
             final SqlNumericLiteral limit = (SqlNumericLiteral) sqlSelect.getFetch();
             final Long limitValue = limit.getValueAs(Long.class);

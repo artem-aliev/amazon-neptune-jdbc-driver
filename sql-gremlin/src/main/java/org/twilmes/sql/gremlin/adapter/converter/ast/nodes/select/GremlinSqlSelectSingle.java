@@ -125,7 +125,7 @@ public class GremlinSqlSelectSingle extends GremlinSqlSelect {
             // can properly recognize that bar=>foo.
             // __.__() is passed in as an anonymous traversal that will be discarded.
             generateDataRetrieval(gremlinSqlIdentifiers, __.__());
-
+            applyLimitOptimization(graphTraversal);
             // Generate actual traversal.
             applyWhere(graphTraversal);
             applyGroupBy(graphTraversal, label);
@@ -153,6 +153,18 @@ public class GremlinSqlSelectSingle extends GremlinSqlSelect {
         }
     }
 
+    /**
+     * the method add limit call before projection parts to help graph engine optimizer to pushdown limits to backend
+     * @param graphTraversal
+     */
+    private void applyLimitOptimization(GraphTraversal<?, ?> graphTraversal) throws SQLException {
+        // we cannot apply the optimization for groups and distinct
+        if (!sqlSelect.isDistinct() && !hasGroupBy() && !sqlSelect.hasWhere()) {
+            applyOffset(graphTraversal);
+            applyLimit(graphTraversal);
+        }
+    }
+
     private void generateDataRetrieval(final List<GremlinSqlIdentifier> gremlinSqlIdentifiers,
                                        GraphTraversal<?, ?> graphTraversal) throws SQLException {
         final String projectLabel = gremlinSqlIdentifiers.get(1).getName(0);
@@ -173,14 +185,17 @@ public class GremlinSqlSelectSingle extends GremlinSqlSelect {
     }
 
     private void applySelectValues(final GraphTraversal<?, ?> graphTraversal) {
-        graphTraversal.select(Column.values);
+        // extract values from group
+        if (hasGroupBy()) {
+            graphTraversal.select(Column.values);
+        } else {
+         //fake groups
+         graphTraversal.local(__.fold());
+        }
     }
 
     protected void applyGroupBy(final GraphTraversal<?, ?> graphTraversal, final String table) throws SQLException {
-        if ((sqlSelect.getGroup() == null) || (sqlSelect.getGroup().getList().isEmpty())) {
-            // If we group bys but we have aggregates, we need to shove things into groups by ourselves.-
-            graphTraversal.group().unfold();
-        } else {
+        if (hasGroupBy()) {
             final List<GremlinSqlNode> gremlinSqlNodes = new ArrayList<>();
             for (final SqlNode sqlNode : sqlSelect.getGroup().getList()) {
                 gremlinSqlNodes.add(GremlinSqlFactory.createNodeCheckType(sqlNode, GremlinSqlIdentifier.class));
@@ -196,12 +211,16 @@ public class GremlinSqlSelectSingle extends GremlinSqlSelect {
         }
     }
 
+    private boolean hasGroupBy() {
+        return sqlSelect.getGroup() != null && !sqlSelect.getGroup().getList().isEmpty();
+    }
+
     protected void applyOrderBy(final GraphTraversal<?, ?> graphTraversal, final String table) throws SQLException {
-        graphTraversal.order();
         if (sqlSelect.getOrderList() == null || sqlSelect.getOrderList().getList().isEmpty()) {
-            graphTraversal.by(__.unfold().id());
+            //graphTraversal.by(__.unfold().id());
             return;
         }
+        graphTraversal.order();
         final List<GremlinSqlNode> gremlinSqlIdentifiers = new ArrayList<>();
         for (final SqlNode sqlNode : sqlSelect.getOrderList().getList()) {
             gremlinSqlIdentifiers.add(GremlinSqlFactory.createNode(sqlNode));

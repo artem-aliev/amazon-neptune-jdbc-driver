@@ -51,17 +51,29 @@ public class NeptuneDriverTestNoEncryption extends NeptuneDriverTestBase {
         super.initialize();
     }
 
-    //@Test
+    @Test
     void testSQL() throws SQLException {
         String url = "jdbc:neptune:sqlgremlin://127.0.0.1;port=8182;authScheme=None;enableSsl=false";
         Connection connection = DriverManager.getConnection(url);
-        ResultSet result = connection.createStatement().executeQuery("select person.name p, software.name s from person inner join software on person.created_OUT_ID = software.created_IN_ID limit 1");
-        while (result.next()) {
+        //ResultSet result = connection.createStatement().executeQuery("select person.name p, software.name s from person inner join software on person.created_OUT_ID = software.created_IN_ID limit 1");
+        //ResultSet result = connection.createStatement().executeQuery("select w_name from bmsql_warehouse where w_tax = 0.2 limit 1");
+        ResultSet result = connection.createStatement().executeQuery("select * from person");
+        result.next();
+        System.out.println("-----------------------------------------");
+        for(int i =1; i <=result.getMetaData().getColumnCount();i++){
+            System.out.print(" " +result.getMetaData().getColumnName(i));
+        }
+        System.out.println("");
+        System.out.println("-----------------------------------------");
+
+        do {
             for(int i =1; i <=result.getMetaData().getColumnCount();i++){
                 System.out.print(" " +result.getObject(i));
             }
             System.out.println("");
-        }
+        } while (result.next());
+        System.out.println("-----------------------------------------");
+
     }
 
     @Test

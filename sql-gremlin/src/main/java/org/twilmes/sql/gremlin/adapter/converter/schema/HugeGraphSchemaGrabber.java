@@ -28,7 +28,7 @@ public final class HugeGraphSchemaGrabber {
     private static final Map<Class<?>, String> TYPE_MAP = new HashMap<>();
     private static final String VERTEX_LABELS_QUERY = "g.getGraph().schema().getVertexLabels().collect {[it.name(), it.properties().collect{it.asLong()}]}";
     private static final String EDGE_LABELS_QUERY = "g.getGraph().schema().getEdgeLabels().collect {[it.name(), it.properties().collect{it.asLong()}, it.sourceLabelName(), it.targetLabelName()]}";
-    private static final String PROPERTY_KEYS_QUERY = " g.getGraph().schema().getPropertyKeys().collect{[it.id().asLong(), it.name(),  it.dataType().clazz().getSimpleName()]}";
+    private static final String PROPERTY_KEYS_QUERY = "g.getGraph().schema().getPropertyKeys().collect{[it.id().asLong(), it.name(),  it.dataType().clazz().getSimpleName()]}";
 
     private HugeGraphSchemaGrabber() {
     }
